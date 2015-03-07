@@ -128,7 +128,7 @@ public int OnClientCookiesCached(int client) {
     g_AwpChoice[client]  = GetCookieBool(client, g_hAwpChoiceCookie);
 }
 
-static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool mimicCompetitivePistolRounds, int dollars_for_mimic_competitive_pistol_rounds) {
+static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool competitivePistolRound, int dollars_for_mimic_competitive_pistol_rounds) {
     nades = "";
     if (GetConVarInt(g_h_sm_retakes_weapon_nades_enabled) == 1)
     {
@@ -139,7 +139,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool mimicC
         bool molotov_allow = terrorist ? (GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_enabled) == 1) : (GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_enabled) == 1);
 
         int rand;
-        if (mimicCompetitivePistolRounds)
+        if (competitivePistolRound)
         {
             int indice = 0;
             // be sure to spend all the money on pistol rounds
@@ -261,7 +261,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
     for (int i = 0; i < tCount; i++) {
         int client = GetArrayCell(tPlayers, i);
 
-        if (mimicCompetitivePistolRounds)
+        if (mimicCompetitivePistolRounds && isPistolRound)
         {
             dollars_for_mimic_competitive_pistol_rounds = 800;
             // 2 against 1 odds to have only kevlar with default pistol
@@ -312,7 +312,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             secondary = "weapon_glock";
             // 2 against 1 odds to have only kevlar without Kit
-            if (mimicCompetitivePistolRounds && KevlarOnlyInt == 2)
+            if (mimicCompetitivePistolRounds && isPistolRound && KevlarOnlyInt == 2)
                 onlyKevlar = true;
         }
 
@@ -321,13 +321,13 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && !onlyKevlar)
+            if (mimicCompetitivePistolRounds && isPistolRound && !onlyKevlar)
                 kevlar = 0;
         }
 
         helmet = true;
         {
-            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || mimicCompetitivePistolRounds)
+            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || (isPistolRound && mimicCompetitivePistolRounds))
                 helmet = false;
         }
 
@@ -336,7 +336,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         if (kevlar == 100)
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
         
-        SetNades(nades, true, mimicCompetitivePistolRounds, dollars_for_mimic_competitive_pistol_rounds);
+        SetNades(nades, true, mimicCompetitivePistolRounds && isPistolRound, dollars_for_mimic_competitive_pistol_rounds);
 
         Retakes_SetPlayerInfo(client, primary, secondary, nades, health, kevlar, helmet, kit);
     }
@@ -344,7 +344,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
     for (int i = 0; i < ctCount; i++) {
         int client = GetArrayCell(ctPlayers, i);
         
-        if (mimicCompetitivePistolRounds)
+        if (mimicCompetitivePistolRounds && isPistolRound)
         {
             dollars_for_mimic_competitive_pistol_rounds = 800;
             // 2 against 1 odds to have only kevlar with default pistol
@@ -384,28 +384,28 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             secondary = "weapon_fiveseven";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_fiveseven;
-            if (mimicCompetitivePistolRounds)
+            if (mimicCompetitivePistolRounds && isPistolRound)
                 kit = false;
         }
         else if (g_Gunchoice[client] == 4 && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
         {
             secondary = "weapon_cz75a";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
-            if (mimicCompetitivePistolRounds)
+            if (mimicCompetitivePistolRounds && isPistolRound)
                 kit = false;
         }
         else if (g_Gunchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
         {
             secondary = "weapon_deagle";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
-            if (mimicCompetitivePistolRounds)
+            if (mimicCompetitivePistolRounds && isPistolRound)
                 kit = false;
         }
         else
         {
             secondary = "weapon_hkp2000";
             // 2 against 1 odds to have only kevlar without Kit
-            if (mimicCompetitivePistolRounds && KevlarOnlyInt == 2)
+            if (mimicCompetitivePistolRounds && isPistolRound && KevlarOnlyInt == 2)
                 onlyKevlar = true;
         }
 
@@ -414,17 +414,17 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && !onlyKevlar)
+            if (mimicCompetitivePistolRounds && isPistolRound && !onlyKevlar)
                 kevlar = 0;
         }
 
         helmet = true;
         {
-            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || mimicCompetitivePistolRounds)
+            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || (isPistolRound && mimicCompetitivePistolRounds))
                 helmet = false;
         }
 
-        if (mimicCompetitivePistolRounds && !kit && KitInsteadOfNade && dollars_for_mimic_competitive_pistol_rounds >= kit_price)
+        if (isPistolRound && mimicCompetitivePistolRounds && !kit && KitInsteadOfNade && dollars_for_mimic_competitive_pistol_rounds >= kit_price)
             kit = true;
 
         if (onlyKevlar)
@@ -435,7 +435,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         if (kevlar == 100)
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
 
-        SetNades(nades, false, mimicCompetitivePistolRounds, dollars_for_mimic_competitive_pistol_rounds);
+        SetNades(nades, false, mimicCompetitivePistolRounds && isPistolRound, dollars_for_mimic_competitive_pistol_rounds);
 
         Retakes_SetPlayerInfo(client, primary, secondary, nades, health, kevlar, helmet, kit);
     }
