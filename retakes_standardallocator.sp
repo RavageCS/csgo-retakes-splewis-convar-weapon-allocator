@@ -12,7 +12,8 @@
 int nade_price_for_hegrenade = 300;
 int nade_price_for_flashbang = 200;
 int nade_price_for_smokegrenade = 500;
-int nade_price_for_molotov = 500;
+int nade_price_for_molotov = 400;
+int nade_price_for_incgrenade = 600;
 
 int gun_price_for_p250 = 300;
 int gun_price_for_cz = 500;
@@ -145,49 +146,49 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
             // be sure to spend all the money on pistol rounds
             for(int i=0; i < 10; i++)
             {
-                rand = GetRandomInt(0, 4);
+                rand = GetRandomInt(1, 4);
+                if ( rand == 4 && (
+                     (terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov) ||
+                     (!terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade) ) )
+                     rand = GetRandomInt(1, 3);
+                if (rand != 3 && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
+                    rand = 3;
+                if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
+                    break;
                 switch(rand) {
                     case 1: 
                         if (hegrenade_allow)
                         {
-                            if (dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade)
-                            {
-                                nades[indice] = 'h';
-                                dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
-                                indice++;
-                            }
+                            nades[indice] = 'h';
+                            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
+                            indice++;
                         }
                     case 2: 
-                        if (flashbang_allow)
-                        {
-                            if (dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang)
-                            {
-                                nades[indice] = 'f';
-                                dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
-                                indice++;
-                            }
-                        }
-                    case 3: 
                         if (smokegrenade_allow)
                         {
-                            if (dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade)
-                            {
-                                nades[indice] = 's';
-                                dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
-                                indice++;
-                            }
+                            nades[indice] = 's';
+                            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
+                            indice++;
+                        }
+                    case 3: 
+                        if (flashbang_allow)
+                        {
+                            nades[indice] = 'f';
+                            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
+                            indice++;
                         }
                     case 4: 
                         if (molotov_allow)
                         {
-                            if (dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov)
-                            {
-                                nades[indice] = terrorist ? 'm' : 'i';
+                            nades[indice] = terrorist ? 'm' : 'i';
+                            if (terrorist)
                                 dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_molotov;
-                                indice++;
-                            }
+                            else
+                                dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
+                            indice++;
                         }
                 }
+
             }
         }
         else
@@ -241,13 +242,10 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
     int health = 100;
     int kevlar = 100;
     bool helmet = true;
-
-    bool onlyKevlar = false;
-
     bool kit = true;
 
-    int KitOrNadeInt = 0;
-    bool KitInsteadOfNade = true;
+    int odds = 0;
+
     bool giveTAwp = true;
     bool giveCTAwp = true;
     if (GetConVarInt(g_h_sm_retakes_weapon_awp_enabled) != 1)
@@ -255,25 +253,12 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         giveTAwp = false;
         giveCTAwp = false;
     }
-    int KevlarOnlyInt = 0;
     int dollars_for_mimic_competitive_pistol_rounds = 800;
 
     for (int i = 0; i < tCount; i++) {
         int client = GetArrayCell(tPlayers, i);
 
-        if (mimicCompetitivePistolRounds && isPistolRound)
-        {
-            dollars_for_mimic_competitive_pistol_rounds = 800;
-            // 2 against 1 odds to have only kevlar with default pistol
-            KevlarOnlyInt = GetRandomInt(0, 2);
-            // 2 against 1 odds to have Kit instead of nade for CT
-            KitOrNadeInt = GetRandomInt(0, 2);
-            KitInsteadOfNade = true;
-            if (KitOrNadeInt == 2)
-                KitInsteadOfNade = false;
-        }
-
-        onlyKevlar = false;
+        dollars_for_mimic_competitive_pistol_rounds = 800;
 
         primary = "";
         if (!isPistolRound)
@@ -311,9 +296,6 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         else
         {
             secondary = "weapon_glock";
-            // 2 against 1 odds to have only kevlar without Kit
-            if (mimicCompetitivePistolRounds && isPistolRound && KevlarOnlyInt == 2)
-                onlyKevlar = true;
         }
 
         health = 100;
@@ -321,8 +303,20 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && isPistolRound && !onlyKevlar)
+            if (mimicCompetitivePistolRounds && isPistolRound)
+            {
                 kevlar = 0;
+                if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
+                {
+                    odds = GetRandomInt(0,2);
+                    // 66% to have kevlar if money
+                    if (odds < 2)
+                    {
+                        kevlar = 100;
+                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
+                    }
+                }
+            }
         }
 
         helmet = true;
@@ -332,9 +326,6 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         }
 
         kit = false;
-
-        if (kevlar == 100)
-            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
         
         SetNades(nades, true, mimicCompetitivePistolRounds && isPistolRound, dollars_for_mimic_competitive_pistol_rounds);
 
@@ -344,19 +335,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
     for (int i = 0; i < ctCount; i++) {
         int client = GetArrayCell(ctPlayers, i);
         
-        if (mimicCompetitivePistolRounds && isPistolRound)
-        {
-            dollars_for_mimic_competitive_pistol_rounds = 800;
-            // 2 against 1 odds to have only kevlar with default pistol
-            KevlarOnlyInt = GetRandomInt(0, 2);
-            // 2 against 1 odds to have Kit instead of nade for CT
-            KitOrNadeInt = GetRandomInt(0, 2);
-            KitInsteadOfNade = true;
-            if (KitOrNadeInt == 2)
-                KitInsteadOfNade = false;
-        }
-
-        onlyKevlar = false;
+        dollars_for_mimic_competitive_pistol_rounds = 800;
 
         primary = "";
         if (!isPistolRound)
@@ -373,8 +352,6 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
             }
         }
 
-        kit = true;
-
         if (g_Gunchoice[client] == 2 && GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
         {
             secondary = "weapon_p250";
@@ -384,29 +361,20 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             secondary = "weapon_fiveseven";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_fiveseven;
-            if (mimicCompetitivePistolRounds && isPistolRound)
-                kit = false;
         }
         else if (g_Gunchoice[client] == 4 && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
         {
             secondary = "weapon_cz75a";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
-            if (mimicCompetitivePistolRounds && isPistolRound)
-                kit = false;
         }
         else if (g_Gunchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
         {
             secondary = "weapon_deagle";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
-            if (mimicCompetitivePistolRounds && isPistolRound)
-                kit = false;
         }
         else
         {
             secondary = "weapon_hkp2000";
-            // 2 against 1 odds to have only kevlar without Kit
-            if (mimicCompetitivePistolRounds && isPistolRound && KevlarOnlyInt == 2)
-                onlyKevlar = true;
         }
 
         health = 100;
@@ -414,8 +382,20 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && isPistolRound && !onlyKevlar)
+            if (mimicCompetitivePistolRounds && isPistolRound)
+            {
                 kevlar = 0;
+                if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
+                {
+                    odds = GetRandomInt(0,2);
+                    // 66% to have kevlar if money before kit and nades
+                    if (odds < 2)
+                    {
+                        kevlar = 100;
+                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
+                    }
+                }
+            }
         }
 
         helmet = true;
@@ -424,16 +404,17 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
                 helmet = false;
         }
 
-        if (isPistolRound && mimicCompetitivePistolRounds && !kit && KitInsteadOfNade && dollars_for_mimic_competitive_pistol_rounds >= kit_price)
-            kit = true;
-
-        if (onlyKevlar)
-            kit = false;
-
-        if (kit)
-            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
-        if (kevlar == 100)
-            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
+        kit = false;
+        if(dollars_for_mimic_competitive_pistol_rounds >= kit_price)
+        {
+            odds = GetRandomInt(0,2);
+            // 66% to get kit if money before nades
+            if (odds < 2)
+            {
+                kit = true;
+                dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
+            }
+        }
 
         SetNades(nades, false, mimicCompetitivePistolRounds && isPistolRound, dollars_for_mimic_competitive_pistol_rounds);
 
