@@ -139,6 +139,11 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         bool smokegrenade_allow = terrorist ? (GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_t_enabled) == 1) : (GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_ct_enabled) == 1);
         bool molotov_allow = terrorist ? (GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_enabled) == 1) : (GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_enabled) == 1);
 
+        int he_number = 0;
+        int smoke_number = 0;
+        int flashbang_number = 0;
+        int molotov_number = 0;
+
         int rand;
         if (competitivePistolRound)
         {
@@ -147,38 +152,49 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
             for(int i=0; i < 10; i++)
             {
                 rand = GetRandomInt(1, 4);
+
+                // no money for molotov
                 if ( rand == 4 && (
                      (terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov) ||
                      (!terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade) ) )
                      rand = GetRandomInt(1, 3);
+                // no money for smoke or hegrenade
                 if (rand != 3 && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
                     rand = 3;
+                // no money for flashbang
                 if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
                     break;
+
+                if (StringToInt(FindConVar("ammo_grenade_limit_total")) <= indice)
+                    break;
+
                 switch(rand) {
                     case 1: 
-                        if (hegrenade_allow)
+                        if (hegrenade_allow && he_number == 0)
                         {
                             nades[indice] = 'h';
                             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
                             indice++;
+                            he_number++;
                         }
                     case 2: 
-                        if (smokegrenade_allow)
+                        if (smokegrenade_allow && smoke_number == 0)
                         {
                             nades[indice] = 's';
                             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
                             indice++;
+                            smoke_number++;
                         }
                     case 3: 
-                        if (flashbang_allow)
+                        if (flashbang_allow && flashbang_number < StringToInt(FindConVar("ammo_grenade_limit_flashbang")))
                         {
                             nades[indice] = 'f';
                             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
                             indice++;
+                            flashbang_number++;
                         }
                     case 4: 
-                        if (molotov_allow)
+                        if (molotov_allow && molotov_number == 0)
                         {
                             nades[indice] = terrorist ? 'm' : 'i';
                             if (terrorist)
@@ -186,6 +202,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                             else
                                 dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
                             indice++;
+                            molotov_number++;
                         }
                 }
 
