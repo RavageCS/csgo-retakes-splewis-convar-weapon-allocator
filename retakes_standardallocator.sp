@@ -144,6 +144,12 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         int flashbang_number = 0;
         int molotov_number = 0;
 
+        ConVar cvar_maxgrenades = FindConVar("ammo_grenade_limit_total");
+        int maxgrenades = cvar_maxgrenades.GetInt();
+        
+        ConVar cvar_maxflashbang = FindConVar("ammo_grenade_limit_flashbang");
+        int maxflashbang = cvar_maxflashbang.GetInt();
+
         int rand;
         if (competitivePistolRound)
         {
@@ -165,7 +171,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                 if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
                     break;
 
-                if (StringToInt(FindConVar("ammo_grenade_limit_total")) <= indice)
+                if (maxgrenades <= indice)
                     break;
 
                 switch(rand) {
@@ -186,7 +192,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                             smoke_number++;
                         }
                     case 3: 
-                        if (flashbang_allow && flashbang_number < StringToInt(FindConVar("ammo_grenade_limit_flashbang")))
+                        if (flashbang_allow && flashbang_number < maxflashbang)
                         {
                             nades[indice] = 'f';
                             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
