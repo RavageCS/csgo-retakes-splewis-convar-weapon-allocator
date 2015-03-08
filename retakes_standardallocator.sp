@@ -405,7 +405,7 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
         }
 
         kit = false;
-        if(dollars_for_mimic_competitive_pistol_rounds >= kit_price)
+        if(dollars_for_mimic_competitive_pistol_rounds >= kit_price && isPistolRound && mimicCompetitivePistolRounds)
         {
             odds = GetRandomInt(0,2);
             // 66% to get kit if money before nades
@@ -415,6 +415,9 @@ public void RifleAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bom
                 dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
             }
         }
+
+	if (!isPistolRound || (isPistolRound && !mimicCompetitivePistolRounds))
+	    kit = true;
 
         SetNades(nades, false, mimicCompetitivePistolRounds && isPistolRound, dollars_for_mimic_competitive_pistol_rounds);
 
