@@ -18,6 +18,12 @@ Explanations
 I've created those **cvars** to customise your server. 
 
 Just add those cvars to change their default value in **server.cfg / autoexec.cfg** :
+> - sm_retakes_weapon_mimic_competitive_pistol_rounds
+>   - **default 1**
+>   - with this option, pistol rounds are played like a 800$ round. 
+>       - 66% kevlar for glock/usp/hkp2000 players (-650$)
+>       - then 66% kit for ct (-400$)
+>       - then nade**s** if enough money
 > - sm_retakes_weapon_primary_enabled
 >   - **default 1**
 >   - *you can set it to 0 if you want a gunmode*
