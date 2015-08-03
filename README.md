@@ -30,29 +30,37 @@ Just add those cvars to change their default value in **server.cfg / autoexec.cf
 > - sm_retakes_weapon_nades_enabled
 >   - **default 1**
 >   - *you can set it to 0 if you don't want nades (all types)*
-> - sm_retakes_weapon_nades_hegrenade_ct_enabled
+> - sm_retakes_weapon_nades_hegrenade_ct_max
 >   - **default 1**
+>   - *this is the max number of HE nades for the whole CT team*
 >   - *you can set it to 0 to forbid hegrenade on CT side*
-> - sm_retakes_weapon_nades_hegrenade_t_enabled
+> - sm_retakes_weapon_nades_hegrenade_t_max
 >   - **default 1**
+>   - *this is the max number of HE nades for the whole T team*
 >   - *you can set it to 0 to forbid hegrenade on T side*
-> - sm_retakes_weapon_nades_flashbang_ct_enabled
+> - sm_retakes_weapon_nades_flashbang_ct_max
 >   - **default 1**
+>   - *this is the max number of flashbang for the whole CT team*
 >   - *you can set it to 0 to forbid flashbang on CT side*
-> - sm_retakes_weapon_nades_flashbang_t_enabled
+> - sm_retakes_weapon_nades_flashbang_t_max
 >   - **default 1**
+>   - *this is the max number of flashbang for the whole T team*
 >   - *you can set it to 0 to forbid flashbang on T side*
-> - sm_retakes_weapon_nades_smokegrenade_ct_enabled
+> - sm_retakes_weapon_nades_smokegrenade_ct_max
 >   - **default 1**
+>   - *this is the max number of smokes for the whole CT team*
 >   - *you can set it to 0 to forbid smokegrenade on CT side*
-> - sm_retakes_weapon_nades_smokegrenade_t_enabled
+> - sm_retakes_weapon_nades_smokegrenade_t_max
 >   - **default 1**
+>   - *this is the max number of smokes for the whole T team*
 >   - *you can set it to 0 to forbid smokegrenade on T side*
-> - sm_retakes_weapon_nades_molotov_ct_enabled
+> - sm_retakes_weapon_nades_molotov_ct_max
 >   - **default 1**
+>   - *this is the max number of molotov for the whole CT team*
 >   - *you can set it to 0 to forbid molotov on CT side*
-> - sm_retakes_weapon_nades_molotov_t_enabled
+> - sm_retakes_weapon_nades_molotov_t_max
 >   - **default 1**
+>   - *this is the max number of molotov for the whole T team*
 >   - *you can set it to 0 to forbid molotov on T side*
 > - sm_retakes_weapon_helmet_enabled
 >   - **default 1**
@@ -60,12 +68,13 @@ Just add those cvars to change their default value in **server.cfg / autoexec.cf
 > - sm_retakes_weapon_kevlar_enabled
 >   - **default 1**
 >   - *you can set it to 0 to remove kevlar (previous cvar must be set to 0)*
-> - sm_retakes_weapon_awp_enabled
+> - sm_retakes_weapon_awp_team_max
 >   - **default 1**
+>   - *this is the max number of AWP per team*
 >   - *you can set it to 0 to forbid AWP*
-> - sm_retakes_weapon_gunrounds
+> - sm_retakes_weapon_pistolrounds
 >   - **default 5**
->   - *this is the number of gun rounds at the beginning of the map. You can set 0 if you always want primary weapon*
+>   - *this is the number of pistol rounds at the beginning of the map. You can set 0 if you always want primary weapon*
 > - sm_retakes_weapon_deagle_enabled
 >   - **default 1**
 >   - *you can set it to 0 to forbid Deagle*
@@ -84,18 +93,18 @@ Guns !
 **Players can write /guns /gun .guns .gun !guns !gun to change their weapons'preferences**
 
 
-> **Gun choice**
-> - HKP2000 / USP / Glock
-> - Tec9 / Fiveseven
+> **Select a pistol:**
+> - Glock/P2000/USP-S
 > - P250
-> - CZ
+> - Fiveseven/Tec-9
+> - CZ75
 > - Deagle
 
-> **Rifle choice for CT**
+> **Select a CT rifle:**
 > - M4A1
 > - M4A4
 
-> **If you want AWP sometimes**
+> **Allow yourself to receive AWPs?**
 > - Yes
 > - No
 
