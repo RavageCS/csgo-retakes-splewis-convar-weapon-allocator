@@ -324,8 +324,10 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         kevlar = 100;
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
+            {
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && isPistolRound)
+            }
+            else if (mimicCompetitivePistolRounds && isPistolRound)
             {
                 kevlar = 0;
                 if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
@@ -343,7 +345,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 
         helmet = true;
         {
-            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || (isPistolRound && mimicCompetitivePistolRounds))
+            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || kevlar == 0 || (isPistolRound && mimicCompetitivePistolRounds))
                 helmet = false;
         }
 
@@ -405,8 +407,10 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         kevlar = 100;
         {
             if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
+            {
                 kevlar = 0;
-            if (mimicCompetitivePistolRounds && isPistolRound)
+            }
+            else if (mimicCompetitivePistolRounds && isPistolRound)
             {
                 kevlar = 0;
                 if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
@@ -424,7 +428,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 
         helmet = true;
         {
-            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || (isPistolRound && mimicCompetitivePistolRounds))
+            if (GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1 || kevlar == 0 || (isPistolRound && mimicCompetitivePistolRounds))
                 helmet = false;
         }
 
