@@ -95,6 +95,9 @@ public void OnPluginStart() {
     g_h_sm_retakes_weapon_p250_enabled = CreateConVar("sm_retakes_weapon_p250_enabled", "1", "Whether the players can choose P250");
     g_h_sm_retakes_weapon_tec9_fiveseven_enabled = CreateConVar("sm_retakes_weapon_tec9_fiveseven_enabled", "1", "Whether the players can choose Tec9/Five seven");
 
+    /** Create/Execute retakes cvars **/
+    AutoExecConfig(true, "retakes_allocator", "sourcemod/retakes");
+
 }
 
 public void OnClientConnected(int client) {
