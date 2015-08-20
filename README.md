@@ -3,27 +3,19 @@ Customised Weapon Allocator
 
 This plugin is an alternate weapon allocator of [Splewis RETAKES Plugin](https://github.com/splewis/csgo-retakes)
 
-**Please be sure to create Issues if you've got trouble on your server, even for a simple question**
-
 Install
 ---------------------
-
-**The compiled SMX file for linux is in the source code zip file**
-
-Just replace the smx file in */csgo/addons/sourcemod/plugins*
-
-Explanations
+Compile retakes_standardallocator.sp 
 ---------------------
 
-I've created those **cvars** to customise your server. 
+default cvars location: cfg/sourcemod/retakes/retakes_allocator.cfg
 
-Just add those cvars to change their default value in **server.cfg / autoexec.cfg** :
 > - sm_retakes_weapon_mimic_competitive_pistol_rounds
 >   - **default 1**
 >   - with this option, pistol rounds are played like a 800$ round. 
->       - 66% kevlar for glock/usp/hkp2000 players (-650$)
->       - then 66% kit for ct (-400$)
->       - then nade**s** if enough money
+>       - 75% kevlar for glock/usp/hkp2000 players (-650$)
+>       - then 100% kit for ct (-400$) (might change this later)
+>       - then nades* if enough money
 > - sm_retakes_weapon_primary_enabled
 >   - **default 1**
 >   - *you can set it to 0 if you want a gunmode*
