@@ -62,9 +62,9 @@ int nades_molotov_ct_max = 0;
 int nades_molotov_t_max = 0;
 
 public Plugin myinfo = {
-    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin",
-    author = "BatMen",
-    description = "Defines convars to customize weapon allocatore of splewig retakes plugin",
+    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin, Gdk add on 1.2",
+    author = "BatMen, Gdk add on",
+    description = "Defines convars to customize weapon allocator of splewis retakes plugin",
     version = PLUGIN_VERSION,
     url = "https://github.com/BatMen/csgo-retakes-splewis-convar-weapon-allocator"
 };
@@ -94,6 +94,9 @@ public void OnPluginStart() {
     g_h_sm_retakes_weapon_cz_enabled = CreateConVar("sm_retakes_weapon_cz_enabled", "1", "Whether the playres can choose CZ");
     g_h_sm_retakes_weapon_p250_enabled = CreateConVar("sm_retakes_weapon_p250_enabled", "1", "Whether the players can choose P250");
     g_h_sm_retakes_weapon_tec9_fiveseven_enabled = CreateConVar("sm_retakes_weapon_tec9_fiveseven_enabled", "1", "Whether the players can choose Tec9/Five seven");
+
+    /** Create/Execute retakes cvars **/
+    AutoExecConfig(true, "retakes_allocator", "sourcemod/retakes");
 
 }
 
@@ -137,108 +140,6 @@ public void OnClientCookiesCached(int client) {
     g_AwpChoice[client]  = GetCookieBool(client, g_hAwpChoiceCookie);
 }
 
-static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool competitivePistolRound, int dollars_for_mimic_competitive_pistol_rounds) {
-    nades = "";
-    if (GetConVarInt(g_h_sm_retakes_weapon_nades_enabled) == 1)
-    {
-        int max_hegrenade_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_hegrenade_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_hegrenade_ct_max);
-        int max_flashbang_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_ct_max);
-        int max_smokegrenade_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_ct_max);
-        int max_molotov_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_max);
-
-        int he_number = 0;
-        int smoke_number = 0;
-        int flashbang_number = 0;
-        int molotov_number = 0;
-
-        int maxgrenades = GetConVarInt(FindConVar("ammo_grenade_limit_total"));
-        int maxflashbang = GetConVarInt(FindConVar("ammo_grenade_limit_flashbang"));
-
-        int rand;
-        int indice = 0;
-        // be sure to spend all the money on pistol rounds
-        for(int i=0; i < 10; i++)
-        {
-            rand = GetRandomInt(1, 4);
-
-            if (competitivePistolRound)
-            {
-                // no money for molotov
-                if ( rand == 4 && (
-                     (terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov) ||
-                     (!terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade) ) )
-                     rand = GetRandomInt(1, 3);
-                // no money for smoke or hegrenade
-                if (rand != 3 && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
-                    rand = 3;
-                // no money for flashbang
-                if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
-                    break;
-            }
-
-            if (maxgrenades <= indice)
-                break;
-
-            if (!competitivePistolRound && indice >= 2)
-                break;
-
-            switch(rand) {
-                case 1: 
-                    if ((terrorist ? nades_hegrenade_t_max : nades_hegrenade_ct_max) < max_hegrenade_allow && he_number == 0)
-                    {
-                        nades[indice] = 'h';
-                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
-                        indice++;
-                        he_number++;
-                        if (terrorist)
-                            nades_hegrenade_t_max++;
-                        else
-                            nades_hegrenade_ct_max++;
-                    }
-                case 2: 
-                    if ((terrorist ? nades_smokegrenade_t_max : nades_smokegrenade_ct_max) < max_smokegrenade_allow && smoke_number == 0)
-                    {
-                        nades[indice] = 's';
-                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
-                        indice++;
-                        smoke_number++;
-                        if (terrorist)
-                            nades_smokegrenade_t_max++;
-                        else
-                            nades_smokegrenade_ct_max++;
-                    }
-                case 3: 
-                    if ((terrorist ? nades_flashbang_t_max : nades_flashbang_ct_max) < max_flashbang_allow && flashbang_number < maxflashbang)
-                    {
-                        nades[indice] = 'f';
-                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
-                        indice++;
-                        flashbang_number++;
-                        if (terrorist)
-                            nades_flashbang_t_max++;
-                        else
-                            nades_flashbang_ct_max++;
-                    }
-                case 4: 
-                    if ((terrorist ? nades_molotov_t_max : nades_molotov_ct_max) < max_molotov_allow && molotov_number == 0)
-                    {
-                        nades[indice] = terrorist ? 'm' : 'i';
-                        if (terrorist)
-                            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_molotov;
-                        else
-                            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
-                        indice++;
-                        molotov_number++;
-                        if (terrorist)
-                            nades_molotov_t_max++;
-                        else
-                            nades_molotov_ct_max++;
-                    }
-            }
-        }
-    }
-}
-
 public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bombsite) {
     int tCount = GetArraySize(tPlayers);
     int ctCount = GetArraySize(ctPlayers);
@@ -276,6 +177,8 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     }
     int dollars_for_mimic_competitive_pistol_rounds = 800;
 
+
+//T players
     for (int i = 0; i < tCount; i++) {
         int client = GetArrayCell(tPlayers, i);
 
@@ -311,9 +214,9 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         }
         else if (g_Pistolchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
-        {
-            secondary = "weapon_deagle";
-            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
+	{
+		secondary = "weapon_deagle";
+		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
         }
         else
         {
@@ -322,26 +225,26 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 
         health = 100;
         kevlar = 100;
-        {
-            if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
-            {
-                kevlar = 0;
-            }
-            else if (mimicCompetitivePistolRounds && isPistolRound)
-            {
-                kevlar = 0;
-                if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
+
+	if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
+	{
+		kevlar = 0;
+	}
+        else if (mimicCompetitivePistolRounds && isPistolRound)
+	{
+		kevlar = 0;
+ 		if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
                 {
-                    odds = GetRandomInt(0,2);
-                    // 66% to have kevlar if money
-                    if (odds < 2)
-                    {
-                        kevlar = 100;
-                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
-                    }
-                }
-            }
-        }
+			odds = GetRandomInt(1,4);
+                    	// 75% to have kevlar if money
+                    	if (odds < 4)
+                    	{
+                     		kevlar = 100;
+                      		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
+			}	
+		}
+
+	}
 
         helmet = true;
         {
@@ -357,6 +260,8 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     }
     
     awp_given = 0;
+
+//Ct players
     for (int i = 0; i < ctCount; i++) {
         int client = GetArrayCell(ctPlayers, i);
         
@@ -405,26 +310,26 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 
         health = 100;
         kevlar = 100;
+
+	if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
+	{
+        	 kevlar = 0;
+ 	}
+       	else if (mimicCompetitivePistolRounds && isPistolRound)
         {
-            if (GetConVarInt(g_h_sm_retakes_weapon_kevlar_enabled) != 1 && GetConVarInt(g_h_sm_retakes_weapon_helmet_enabled) != 1)
-            {
-                kevlar = 0;
-            }
-            else if (mimicCompetitivePistolRounds && isPistolRound)
-            {
-                kevlar = 0;
-                if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
+		kevlar = 0;
+		if (dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
                 {
-                    odds = GetRandomInt(0,2);
-                    // 66% to have kevlar if money before kit and nades
-                    if (odds < 2)
-                    {
-                        kevlar = 100;
-                        dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
-                    }
-                }
-            }
-        }
+                	odds = GetRandomInt(1,4);
+                 	// 75% to have kevlar if money before kit and nades
+                 	if (odds < 4)
+                 	{
+                        	kevlar = 100;
+                        	dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
+                 	}
+		}
+	}
+
 
         helmet = true;
         {
@@ -435,13 +340,14 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         kit = false;
         if(dollars_for_mimic_competitive_pistol_rounds >= kit_price && isPistolRound && mimicCompetitivePistolRounds)
         {
-            odds = GetRandomInt(0,2);
+		//Change to always give kit before nades
+            //odds = GetRandomInt(0,2);
             // 66% to get kit if money before nades
-            if (odds < 2)
-            {
+            //if (odds < 2)
+            //{
                 kit = true;
                 dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
-            }
+            //}
         }
 
         if (!isPistolRound || (isPistolRound && !mimicCompetitivePistolRounds))
@@ -452,6 +358,131 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         Retakes_SetPlayerInfo(client, primary, secondary, nades, health, kevlar, helmet, kit);
     }
 }
+
+static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool competitivePistolRound, int dollars_for_mimic_competitive_pistol_rounds) {
+    nades = "";
+    if (GetConVarInt(g_h_sm_retakes_weapon_nades_enabled) == 1)
+    {
+        int max_hegrenade_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_hegrenade_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_hegrenade_ct_max);
+        int max_flashbang_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_ct_max);
+        int max_smokegrenade_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_ct_max);
+        int max_molotov_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_max);
+	
+        int he_number = 0;
+        int smoke_number = 0;
+        int flashbang_number = 0;
+        int molotov_number = 0;
+
+        int maxgrenades = GetConVarInt(FindConVar("ammo_grenade_limit_total"));
+        int maxflashbang = GetConVarInt(FindConVar("ammo_grenade_limit_flashbang"));
+
+        int rand;
+	int randgive = 0;
+        int indice = 0;
+        // be sure to spend all the money on pistol rounds
+        for(int i=0; i < 10; i++)
+        {
+            rand = GetRandomInt(1, 4);
+
+            if (competitivePistolRound)
+            {
+                // no money for molotov
+                if ( rand == 4 && (
+                     (terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov) ||
+                     (!terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade) ) )
+                     rand = GetRandomInt(1, 3);
+                // no money for smoke or hegrenade
+                if (rand != 3 && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
+                    rand = 3;
+                // no money for flashbang
+                if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
+                    break;
+            }
+
+            if (maxgrenades <= indice)
+                break;
+
+            if (!competitivePistolRound && indice >= 2)
+                break;
+
+            switch(rand) {
+		
+		//Gdk: add 50% chance to give no nade of that type
+		case 1:
+			if ((terrorist ? nades_smokegrenade_t_max : nades_smokegrenade_ct_max) < max_smokegrenade_allow && smoke_number == 0)
+			{
+				randgive = GetRandomInt(1, 2);
+                    		if(randgive < 2)
+				{
+						nades[indice] = 's';
+                        			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
+                        			smoke_number++;
+                        			if (terrorist)
+							nades_smokegrenade_t_max++;
+						else
+                            				nades_smokegrenade_ct_max++;
+				}
+				indice++;
+			}
+			
+		case 2:
+			if ((terrorist ? nades_hegrenade_t_max : nades_hegrenade_ct_max) < max_hegrenade_allow && he_number == 0)
+                    	{
+				randgive = GetRandomInt(1, 2);
+                    		if(randgive < 2)
+				{
+                      			nades[indice] = 'h';
+                        		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
+                        		he_number++;
+                        		if (terrorist)
+                            			nades_hegrenade_t_max++;
+                        		else
+                            			nades_hegrenade_ct_max++;
+				}
+				indice++;
+                   	}			
+
+                case 3:
+			if ((terrorist ? nades_flashbang_t_max : nades_flashbang_ct_max) < max_flashbang_allow && flashbang_number < maxflashbang)
+                    	{
+				randgive = GetRandomInt(1, 2);
+                    		if(randgive < 2)
+				{
+                        		nades[indice] = 'f';
+                        		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
+                        		flashbang_number++;
+                        		if (terrorist)
+                            			nades_flashbang_t_max++;
+                        		else
+                           			nades_flashbang_ct_max++;
+				}
+				indice++;
+                   	}
+
+                case 4:
+			if ((terrorist ? nades_molotov_t_max : nades_molotov_ct_max) < max_molotov_allow && molotov_number == 0)
+                    	{
+				randgive = GetRandomInt(1, 2);
+                    		if(randgive < 2)
+				{	
+                        		nades[indice] = terrorist ? 'm' : 'i';
+                        		if (terrorist)
+                            			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_molotov;
+                        		else
+                            			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
+                        		molotov_number++;
+                        		if (terrorist)
+                            			nades_molotov_t_max++;
+                        		else
+                            			nades_molotov_ct_max++;
+				}
+				indice++;
+                    	}
+            }//switch(rand)
+
+        }//for(int i=0; i < 10; i++)
+    }//if (GetConVarInt(g_h_sm_retakes_weapon_nades_enabled) == 1)
+}//static void SetNades
 
 public void GivePistolMenu(int client) {
     Handle menu = CreateMenu(MenuHandler_PISTOL);
