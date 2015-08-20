@@ -3,6 +3,8 @@ Customised Weapon Allocator
 
 This plugin is an alternate weapon allocator of [Splewis RETAKES Plugin](https://github.com/splewis/csgo-retakes)
 
+This is a fork of https://github.com/BatMen/csgo-retakes-splewis-convar-weapon-allocator
+
 Install
 ---------------------
 Compile retakes_standardallocator.sp 
