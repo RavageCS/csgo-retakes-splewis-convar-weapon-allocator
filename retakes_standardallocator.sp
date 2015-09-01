@@ -14,6 +14,7 @@ int nade_price_for_flashbang = 200;
 int nade_price_for_smokegrenade = 500;
 int nade_price_for_molotov = 400;
 int nade_price_for_incgrenade = 600;
+int nade_price_for_decoy = 50;
 
 int gun_price_for_p250 = 300;
 int gun_price_for_cz = 500;
@@ -55,6 +56,8 @@ Handle g_h_sm_retakes_weapon_cz_enabled  = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_p250_enabled  = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_tec9_fiveseven_enabled = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_dual_elite_enabled = INVALID_HANDLE;
+Handle g_h_sm_retakes_weapon_nades_decoy_ct_max = INVALID_HANDLE;
+Handle g_h_sm_retakes_weapon_nades_decoy_t_max = INVALID_HANDLE;
 
 int nades_hegrenade_ct_max = 0;
 int nades_hegrenade_t_max = 0;
@@ -64,9 +67,11 @@ int nades_smokegrenade_ct_max = 0;
 int nades_smokegrenade_t_max = 0;
 int nades_molotov_ct_max = 0;
 int nades_molotov_t_max = 0;
+int nades_decoy_ct_max = 0;
+int nades_decoy_t_max = 0;
 
 public Plugin myinfo = {
-    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin, Gdk add on 2.2",
+    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin, Gdk add on 3.0",
     author = "BatMen, Gdk add on",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
     version = PLUGIN_VERSION,
@@ -101,6 +106,8 @@ public void OnPluginStart() {
     g_h_sm_retakes_weapon_p250_enabled = CreateConVar("sm_retakes_weapon_p250_enabled", "1", "Whether the players can choose P250");
     g_h_sm_retakes_weapon_tec9_fiveseven_enabled = CreateConVar("sm_retakes_weapon_tec9_fiveseven_enabled", "1", "Whether the players can choose Tec9/Five seven");
     g_h_sm_retakes_weapon_dual_elite_enabled = CreateConVar("sm_retakes_weapon_dual_elite_enabled", "1", "Whether the players can choose Dual Elite");
+	g_h_sm_retakes_weapon_nades_decoy_ct_max = CreateConVar("sm_retakes_weapon_nades_decoy_ct_max", "1", "Number of flashbang CT team can have");
+	g_h_sm_retakes_weapon_nades_decoy_t_max = CreateConVar("sm_retakes_weapon_nades_decoy_t_max", "1", "Number of flashbang T team can have");
 
     /** Create/Execute retakes cvars **/
     AutoExecConfig(true, "retakes_allocator", "sourcemod/retakes");
@@ -187,6 +194,8 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     nades_flashbang_t_max = 0;
     nades_molotov_ct_max = 0;
     nades_molotov_t_max = 0;
+	nades_decoy_ct_max = 0;
+	nades_decoy_t_max = 0;
 
     int awp_given = 0;
     bool giveTAwp = true;
@@ -524,6 +533,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         int max_flashbang_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_flashbang_ct_max);
         int max_smokegrenade_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_smokegrenade_ct_max);
         int max_molotov_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_max);
+	int max_decoy_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_decoy_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_decoy_ct_max);
 
 	bool isPistolRound = GetConVarInt(g_h_sm_retakes_weapon_primary_enabled) == 0 || Retakes_GetRetakeRoundsPlayed() < GetConVarInt(g_h_sm_retakes_weapon_pistolrounds);
 	
@@ -531,6 +541,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         int smoke_number = 0;
         int flashbang_number = 0;
         int molotov_number = 0;
+	int decoy_number = 0;
 
         int maxgrenades = GetConVarInt(FindConVar("ammo_grenade_limit_total"));
         int maxflashbang = GetConVarInt(FindConVar("ammo_grenade_limit_flashbang"));
@@ -542,21 +553,6 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         for(int i=0; i < 10; i++)
         {
             rand = GetRandomInt(1, 4);
-
-            if (competitivePistolRound)
-            {
-                // no money for molotov
-                if ( rand == 4 && (
-                     (terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov) ||
-                     (!terrorist && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade) ) )
-                     rand = GetRandomInt(1, 3);
-                // no money for smoke or hegrenade
-                if (rand != 3 && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
-                    rand = 3;
-                // no money for flashbang
-                if (dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
-                    break;
-            }
 
             if (maxgrenades <= indice)
                 break;
@@ -570,9 +566,12 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 		case 1:
 			if ((terrorist ? nades_smokegrenade_t_max : nades_smokegrenade_ct_max) < max_smokegrenade_allow && smoke_number == 0)
 			{
-				randgive = GetRandomInt(1, 2);
-				if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade)
+				randgive = GetRandomInt(1, 3);
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade)
 					randgive = 1;
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_smokegrenade)
+					randgive = 10;
+
                     		if(randgive < 2)
 				{
 						nades[indice] = 's';
@@ -590,9 +589,12 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 			if ((terrorist ? nades_hegrenade_t_max : nades_hegrenade_ct_max) < max_hegrenade_allow && he_number == 0)
                     	{
 				randgive = GetRandomInt(1, 2);
-                    		if(randgive < 2)
 				if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade)
 					randgive = 1;
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
+					randgive = 10;
+
+				if(randgive < 2)
 				{
                       			nades[indice] = 'h';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
@@ -609,9 +611,12 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 			if ((terrorist ? nades_flashbang_t_max : nades_flashbang_ct_max) < max_flashbang_allow && flashbang_number < maxflashbang)
                     	{
 				randgive = GetRandomInt(1, 2);
-                    		if(randgive < 2)
 				if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang)
 					randgive = 1;
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
+					randgive = 10;
+
+				if(randgive < 2)
 				{
                         		nades[indice] = 'f';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
@@ -627,7 +632,24 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                 case 4:
 			if ((terrorist ? nades_molotov_t_max : nades_molotov_ct_max) < max_molotov_allow && molotov_number == 0)
                     	{
-				randgive = GetRandomInt(1, 2);
+				//Change percent to 20%
+				randgive = GetRandomInt(1, 5);
+				
+				if(terrorist)
+				{
+					if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov)
+						randgive = 1;
+					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov)
+						randgive = 10;
+				}
+				else
+				{
+					if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_incgrenade)
+						randgive = 1;
+					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade)
+						randgive = 10;
+				}
+
                     		if(randgive < 2)
 				{	
                         		nades[indice] = terrorist ? 'm' : 'i';
@@ -640,6 +662,15 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                             			nades_molotov_t_max++;
                         		else
                             			nades_molotov_ct_max++;
+				}
+				else if(randgive > 4 && (terrorist ? nades_decoy_t_max : nades_decoy_ct_max) < max_decoy_allow && decoy_number == 0) //sometimes give decoy
+				{
+					nades[indice] = 'd';
+					dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_decoy;
+					if (terrorist)
+                            			nades_decoy_t_max++;
+                        		else
+                            			nades_decoy_ct_max++;
 				}
 				indice++;
                     	}
