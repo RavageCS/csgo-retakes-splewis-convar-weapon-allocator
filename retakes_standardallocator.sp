@@ -5,7 +5,6 @@
 #include "retakes/generic.sp"
 
 #pragma semicolon 1
-#pragma newdecls required
 
 #define MENU_TIME_LENGTH 15
 
@@ -21,7 +20,7 @@ int gun_price_for_cz = 500;
 int gun_price_for_fiveseven = 500;
 int gun_price_for_tec9 = 500;
 int gun_price_for_deagle = 700;
-int gun_price_for_elite;
+int gun_price_for_elite = 500;
 
 int kit_price = 400;
 int kevlar_price = 650;
@@ -71,11 +70,11 @@ int nades_decoy_ct_max = 0;
 int nades_decoy_t_max = 0;
 
 public Plugin myinfo = {
-    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin, Gdk add on 3.0",
+    name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin, Gdk add on 3.4",
     author = "BatMen, Gdk add on",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
     version = PLUGIN_VERSION,
-    url = "https://github.com/BatMen/csgo-retakes-splewis-convar-weapon-allocator"
+    url = "https://github.com/RavageCS/csgo-retakes-splewis-convar-weapon-allocator"
 };
 
 public void OnPluginStart() {
@@ -91,23 +90,23 @@ public void OnPluginStart() {
     g_h_sm_retakes_weapon_nades_enabled = CreateConVar("sm_retakes_weapon_nades_enabled", "1", "Whether the players can have nades");
     g_h_sm_retakes_weapon_nades_hegrenade_ct_max = CreateConVar("sm_retakes_weapon_nades_hegrenade_ct_max", "1", "Number of hegrenade CT team can have");
     g_h_sm_retakes_weapon_nades_hegrenade_t_max = CreateConVar("sm_retakes_weapon_nades_hegrenade_t_max", "1", "Number of hegrenade T team can have");
-    g_h_sm_retakes_weapon_nades_flashbang_ct_max = CreateConVar("sm_retakes_weapon_nades_flashbang_ct_max", "1", "Number of flashbang CT team can have");
+    g_h_sm_retakes_weapon_nades_flashbang_ct_max = CreateConVar("sm_retakes_weapon_nades_flashbang_ct_max", "2", "Number of flashbang CT team can have");
     g_h_sm_retakes_weapon_nades_flashbang_t_max = CreateConVar("sm_retakes_weapon_nades_flashbang_t_max", "1", "Number of flashbang T team can have");
     g_h_sm_retakes_weapon_nades_smokegrenade_ct_max = CreateConVar("sm_retakes_weapon_nades_smokegrenade_ct_max", "1", "Number of smokegrenade CT team can have");
     g_h_sm_retakes_weapon_nades_smokegrenade_t_max = CreateConVar("sm_retakes_weapon_nades_smokegrenade_t_max", "1", "Number of smokegrenade T team can have");
     g_h_sm_retakes_weapon_nades_molotov_ct_max = CreateConVar("sm_retakes_weapon_nades_molotov_ct_max", "1", "Number of molotov CT team can have");
     g_h_sm_retakes_weapon_nades_molotov_t_max = CreateConVar("sm_retakes_weapon_nades_molotov_t_max", "1", "Number of molotov T team can have");
-//    g_h_sm_retakes_weapon_helmet_enabled = CreateConVar("sm_retakes_weapon_helmet_enabled", "1", "Whether the players have helmet");
-//   g_h_sm_retakes_weapon_kevlar_enabled = CreateConVar("sm_retakes_weapon_kevlar_enabled", "1", "Whether the players have kevlar");
+//  g_h_sm_retakes_weapon_helmet_enabled = CreateConVar("sm_retakes_weapon_helmet_enabled", "1", "Whether the players have helmet");
+//  g_h_sm_retakes_weapon_kevlar_enabled = CreateConVar("sm_retakes_weapon_kevlar_enabled", "1", "Whether the players have kevlar");
     g_h_sm_retakes_weapon_awp_team_max = CreateConVar("sm_retakes_weapon_awp_team_max", "1", "The max number of AWP per team (0 = no awp)");
-    g_h_sm_retakes_weapon_pistolrounds = CreateConVar("sm_retakes_weapon_pistolrounds", "5", "The number of gun rounds (0 = no gun round)");
+    g_h_sm_retakes_weapon_pistolrounds = CreateConVar("sm_retakes_weapon_pistolrounds", "5", "The number of pistol rounds (0 = no pistol round)");
     g_h_sm_retakes_weapon_deagle_enabled = CreateConVar("sm_retakes_weapon_deagle_enabled", "1", "Whether the players can choose deagle");
-    g_h_sm_retakes_weapon_cz_enabled = CreateConVar("sm_retakes_weapon_cz_enabled", "1", "Whether the playres can choose CZ");
+    g_h_sm_retakes_weapon_cz_enabled = CreateConVar("sm_retakes_weapon_cz_enabled", "1", "Whether the players can choose CZ");
     g_h_sm_retakes_weapon_p250_enabled = CreateConVar("sm_retakes_weapon_p250_enabled", "1", "Whether the players can choose P250");
     g_h_sm_retakes_weapon_tec9_fiveseven_enabled = CreateConVar("sm_retakes_weapon_tec9_fiveseven_enabled", "1", "Whether the players can choose Tec9/Five seven");
     g_h_sm_retakes_weapon_dual_elite_enabled = CreateConVar("sm_retakes_weapon_dual_elite_enabled", "1", "Whether the players can choose Dual Elite");
-	g_h_sm_retakes_weapon_nades_decoy_ct_max = CreateConVar("sm_retakes_weapon_nades_decoy_ct_max", "1", "Number of flashbang CT team can have");
-	g_h_sm_retakes_weapon_nades_decoy_t_max = CreateConVar("sm_retakes_weapon_nades_decoy_t_max", "1", "Number of flashbang T team can have");
+    g_h_sm_retakes_weapon_nades_decoy_ct_max = CreateConVar("sm_retakes_weapon_nades_decoy_ct_max", "1", "Number of decoys CT team can have");
+    g_h_sm_retakes_weapon_nades_decoy_t_max = CreateConVar("sm_retakes_weapon_nades_decoy_t_max", "1", "Number of decoys T team can have");
 
     /** Create/Execute retakes cvars **/
     AutoExecConfig(true, "retakes_allocator", "sourcemod/retakes");
@@ -183,7 +182,8 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     int kevlar = 100;
     bool helmet = true;
     bool kit = true;
-
+    int numkits = 0;
+ 
     int odds = 0;
 
     nades_hegrenade_ct_max = 0;
@@ -194,8 +194,8 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
     nades_flashbang_t_max = 0;
     nades_molotov_ct_max = 0;
     nades_molotov_t_max = 0;
-	nades_decoy_ct_max = 0;
-	nades_decoy_t_max = 0;
+    nades_decoy_ct_max = 0;
+    nades_decoy_t_max = 0;
 
     int awp_given = 0;
     bool giveTAwp = true;
@@ -251,7 +251,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             		secondary = "weapon_cz75a";
             		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         	}
-        	else if (g_Pistolchoice[client] == 5)
+        	else if (g_Pistolchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
@@ -289,7 +289,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             		secondary = "weapon_cz75a";
             		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         	}
-        	else if (g_Pistolchoice[client] == 5)
+        	else if (g_Pistolchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
@@ -334,7 +334,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         	{
             		secondary = "weapon_cz75a";
         	}
-        	else if (g_Sidechoice[client] == 5)
+        	else if (g_Sidechoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 		}
@@ -400,7 +400,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             		secondary = "weapon_cz75a";
             		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         	}
-        	else if (g_Pistolchoice[client] == 5)
+        	else if (g_Pistolchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
@@ -423,6 +423,15 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 		kit = false;
 		helmet = false;
 		health = 100;
+
+		//Testing
+		//new String:testCt[12];	
+		//new String:testT[12];
+		//IntToString(ctCount, testCt, 12);
+		//IntToString(tCount, testT, 12);
+		//PrintToChatAll("CT Count: %s", testCt);
+		//PrintToChatAll("T Count: %s", testT);
+
 		if (g_Pistolchoice[client] == 2 && GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
         	{
             		secondary = "weapon_p250";
@@ -438,7 +447,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             		secondary = "weapon_cz75a";
             		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         	}
-        	else if (g_Pistolchoice[client] == 5)
+        	else if (g_Pistolchoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
@@ -475,12 +484,21 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 		if(dollars_for_mimic_competitive_pistol_rounds >= kit_price)
         	{
 			kit = true;
+			numkits ++;
                 	dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
 		}
 		else if(dollars_for_mimic_competitive_pistol_rounds < kit_price)
 		{
 			kit = false;
 		}
+		
+		//If there are no kits, give one if there are 2-4 ct's
+		if(ctCount > 1 && ctCount < 5 && numkits < 1)
+		{
+			kit = true;
+			numkits++;
+		}
+		
 	}
 	
 	if(!isPistolRound || !mimicCompetitivePistolRounds)
@@ -502,7 +520,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
         	{
             		secondary = "weapon_cz75a";
         	}
-        	else if (g_Sidechoice[client] == 5)
+        	else if (g_Sidechoice[client] == 5 && GetConVarInt(g_h_sm_retakes_weapon_dual_elite_enabled) == 1)
 		{
 			secondary = "weapon_elite";
 		}
@@ -535,8 +553,8 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         int max_molotov_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_molotov_ct_max);
 	int max_decoy_allow = terrorist ? GetConVarInt(g_h_sm_retakes_weapon_nades_decoy_t_max) : GetConVarInt(g_h_sm_retakes_weapon_nades_decoy_ct_max);
 
-	bool isPistolRound = GetConVarInt(g_h_sm_retakes_weapon_primary_enabled) == 0 || Retakes_GetRetakeRoundsPlayed() < GetConVarInt(g_h_sm_retakes_weapon_pistolrounds);
-	
+	//bool isPistolRound = GetConVarInt(g_h_sm_retakes_weapon_primary_enabled) == 0 || Retakes_GetRetakeRoundsPlayed() < GetConVarInt(g_h_sm_retakes_weapon_pistolrounds);	
+
         int he_number = 0;
         int smoke_number = 0;
         int flashbang_number = 0;
@@ -562,7 +580,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 
             switch(rand) {
 		
-		//Gdk: add 50% chance to give no nade of that type
+		//Gdk: add 50% chance to give no nade of that type except on comp pistol rounds
 		case 1:
 			if ((terrorist ? nades_smokegrenade_t_max : nades_smokegrenade_ct_max) < max_smokegrenade_allow && smoke_number == 0)
 			{
@@ -589,7 +607,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 			if ((terrorist ? nades_hegrenade_t_max : nades_hegrenade_ct_max) < max_hegrenade_allow && he_number == 0)
                     	{
 				randgive = GetRandomInt(1, 2);
-				if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade)
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade)
 					randgive = 1;
 				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
 					randgive = 10;
@@ -611,7 +629,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 			if ((terrorist ? nades_flashbang_t_max : nades_flashbang_ct_max) < max_flashbang_allow && flashbang_number < maxflashbang)
                     	{
 				randgive = GetRandomInt(1, 2);
-				if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang)
+				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang)
 					randgive = 1;
 				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
 					randgive = 10;
@@ -637,14 +655,14 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 				
 				if(terrorist)
 				{
-					if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov)
+					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov)
 						randgive = 1;
 					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov)
 						randgive = 10;
 				}
 				else
 				{
-					if(isPistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_incgrenade)
+					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_incgrenade)
 						randgive = 1;
 					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade)
 						randgive = 10;
@@ -665,12 +683,15 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 				}
 				else if(randgive > 4 && (terrorist ? nades_decoy_t_max : nades_decoy_ct_max) < max_decoy_allow && decoy_number == 0) //sometimes give decoy
 				{
-					nades[indice] = 'd';
-					dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_decoy;
-					if (terrorist)
-                            			nades_decoy_t_max++;
-                        		else
-                            			nades_decoy_ct_max++;
+					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_decoy || !competitivePistolRound)
+					{
+						nades[indice] = 'd';
+						dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_decoy;
+						if (terrorist)
+                            				nades_decoy_t_max++;
+                        			else
+                            				nades_decoy_ct_max++;
+					}
 				}
 				indice++;
                     	}
