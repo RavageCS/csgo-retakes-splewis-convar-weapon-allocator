@@ -544,7 +544,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 					odds = GetRandomInt(1,10);
                  			// 80% to have kevlar if money before kit and nades
 					// 20% will have kevlar and nades
-                 			if (odds > 8)
+                 			if (odds > 2)
                  			{
                         			kevlar = 100;
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
