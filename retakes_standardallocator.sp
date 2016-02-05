@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin,",
     author = "BatMen and Gdk",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
-    version = "5.0.0",
+    version = "5.1.0",
     url = "https://github.com/RavageCS/csgo-retakes-splewis-convar-weapon-allocator"
 };
 
@@ -496,9 +496,9 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 			//PrintToChatAll("CT Count: %s", testCt);
 			//PrintToChatAll("T Count: %s", testT);
 
-			// 33% chance to have a kit
-			odds = GetRandomInt(1, 3);
-			if(odds == 3)
+			// 25% chance to have a kit
+			odds = GetRandomInt(1, 4);
+			if(odds == 1)
 			{
 				kit = true;
 				numkits++;
@@ -600,7 +600,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
         int rand;
 	int randgive = 0;
         int indice = 0;
-        // be sure to spend all the money on pistol rounds
+
         for(int i=0; i < 10; i++)
         {
             rand = GetRandomInt(1, 4);
@@ -613,17 +613,17 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 
             switch(rand) {
 		
-		//Add chance to give no nade of that type except on comp pistol rounds
+		//Add chance to give no nade of that type
 		case 1:
 			if ((terrorist ? nades_smokegrenade_t_count : nades_smokegrenade_ct_count) < max_smokegrenade_allow && smoke_number == 0)
 			{
-				randgive = GetRandomInt(1, 3);
+				randgive = GetRandomInt(1, 4);
 				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade)
 					randgive = 1;
 				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_smokegrenade)
 					randgive = 10;
 
-                    		if(randgive < 2)
+                    		if(randgive > 2)
 				{
 						nades[indice] = 's';
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
@@ -639,13 +639,9 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 		case 2:
 			if ((terrorist ? nades_hegrenade_t_count : nades_hegrenade_ct_count) < max_hegrenade_allow && he_number == 0)
                     	{
-				randgive = GetRandomInt(1, 2);
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade)
-					randgive = 1;
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_hegrenade)
-					randgive = 10;
+				randgive = GetRandomInt(1, 3);
 
-				if(randgive < 2)
+				if(randgive > 1)
 				{
                       			nades[indice] = 'h';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
@@ -661,13 +657,9 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                 case 3:
 			if ((terrorist ? nades_flashbang_t_count : nades_flashbang_ct_count) < max_flashbang_allow && flashbang_number < maxflashbang)
                     	{
-				randgive = GetRandomInt(1, 2);
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang)
-					randgive = 1;
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_flashbang)
-					randgive = 10;
+				randgive = GetRandomInt(1, 3);
 
-				if(randgive < 2)
+				if(randgive > 1)
 				{
                         		nades[indice] = 'f';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
@@ -685,20 +677,6 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                     	{
 				randgive = GetRandomInt(1, 10);
 				
-				if(terrorist)
-				{
-					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov)
-						randgive = 1;
-					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_molotov)
-						randgive = 10;
-				}
-				else
-				{
-					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_incgrenade)
-						randgive = 1;
-					if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_incgrenade)
-						randgive = 10;
-				}
 				//10% chance to give molotov
                     		if(randgive < 2)
 				{	
