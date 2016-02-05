@@ -618,10 +618,6 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 			if ((terrorist ? nades_smokegrenade_t_count : nades_smokegrenade_ct_count) < max_smokegrenade_allow && smoke_number == 0)
 			{
 				randgive = GetRandomInt(1, 4);
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade)
-					randgive = 1;
-				if(competitivePistolRound && dollars_for_mimic_competitive_pistol_rounds < nade_price_for_smokegrenade)
-					randgive = 10;
 
                     		if(randgive > 2)
 				{
