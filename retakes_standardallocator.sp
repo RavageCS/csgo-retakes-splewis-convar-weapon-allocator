@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin,",
     author = "BatMen and Gdk",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
-    version = "5.1.0",
+    version = "5.2.1",
     url = "https://github.com/RavageCS/csgo-retakes-splewis-convar-weapon-allocator"
 };
 
@@ -496,9 +496,9 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 			//PrintToChatAll("CT Count: %s", testCt);
 			//PrintToChatAll("T Count: %s", testT);
 
-			// 25% chance to have a kit
-			odds = GetRandomInt(1, 4);
-			if(odds == 1)
+			//30% chance to have a kit
+			odds = GetRandomInt(1, 10);
+			if(odds > 7)
 			{
 				kit = true;
 				numkits++;
@@ -541,10 +541,10 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 				secondary = "weapon_hkp2000";
 				if(dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
 				{
-					odds = GetRandomInt(1,4);
+					odds = GetRandomInt(1,10);
                  			// 80% to have kevlar if money before kit and nades
 					// 20% will have kevlar and nades
-                 			if (odds < 4)
+                 			if (odds > 8)
                  			{
                         			kevlar = 100;
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
@@ -617,9 +617,9 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 		case 1:
 			if ((terrorist ? nades_smokegrenade_t_count : nades_smokegrenade_ct_count) < max_smokegrenade_allow && smoke_number == 0)
 			{
-				randgive = GetRandomInt(1, 4);
+				randgive = GetRandomInt(1, 10);
 
-                    		if(randgive > 2)
+                    		if(randgive > 6)
 				{
 						nades[indice] = 's';
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
@@ -635,9 +635,9 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 		case 2:
 			if ((terrorist ? nades_hegrenade_t_count : nades_hegrenade_ct_count) < max_hegrenade_allow && he_number == 0)
                     	{
-				randgive = GetRandomInt(1, 3);
+				randgive = GetRandomInt(1, 10);
 
-				if(randgive > 1)
+				if(randgive > 4)
 				{
                       			nades[indice] = 'h';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
@@ -653,9 +653,9 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
                 case 3:
 			if ((terrorist ? nades_flashbang_t_count : nades_flashbang_ct_count) < max_flashbang_allow && flashbang_number < maxflashbang)
                     	{
-				randgive = GetRandomInt(1, 3);
+				randgive = GetRandomInt(1, 10);
 
-				if(randgive > 1)
+				if(randgive > 4)
 				{
                         		nades[indice] = 'f';
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
