@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin,",
     author = "BatMen and Gdk",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
-    version = "5.2.1",
+    version = "5.2.2",
     url = "https://github.com/RavageCS/csgo-retakes-splewis-convar-weapon-allocator"
 };
 
@@ -621,6 +621,8 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 
                     		if(randgive > 6)
 				{
+					if(dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_smokegrenade || !competitivePistolRound)
+					{
 						nades[indice] = 's';
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_smokegrenade;
                         			smoke_number++;
@@ -628,6 +630,7 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 							nades_smokegrenade_t_count++;
 						else
                             				nades_smokegrenade_ct_count++;
+					}
 				}
 				indice++;
 			}
@@ -639,13 +642,16 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 
 				if(randgive > 4)
 				{
-                      			nades[indice] = 'h';
-                        		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
-                        		he_number++;
-                        		if (terrorist)
-                            			nades_hegrenade_t_count++;
-                        		else
-                            			nades_hegrenade_ct_count++;
+                      			if(dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_hegrenade || !competitivePistolRound)
+					{
+						nades[indice] = 'h';
+                        			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_hegrenade;
+                        			he_number++;
+                        			if (terrorist)
+                            				nades_hegrenade_t_count++;
+                        			else
+                            				nades_hegrenade_ct_count++;
+					}
 				}
 				indice++;
                    	}			
@@ -657,13 +663,16 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 
 				if(randgive > 4)
 				{
-                        		nades[indice] = 'f';
-                        		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
-                        		flashbang_number++;
-                        		if (terrorist)
-                            			nades_flashbang_t_count++;
-                        		else
-                           			nades_flashbang_ct_count++;
+					if(dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_flashbang || !competitivePistolRound)
+					{
+                        			nades[indice] = 'f';
+                        			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_flashbang;
+                        			flashbang_number++;
+                        			if (terrorist)
+                            				nades_flashbang_t_count++;
+                        			else
+                           				nades_flashbang_ct_count++;
+					}
 				}
 				indice++;
                    	}
@@ -676,16 +685,26 @@ static void SetNades(char nades[NADE_STRING_LENGTH], bool terrorist, bool compet
 				//10% chance to give molotov
                     		if(randgive < 2)
 				{	
-                        		nades[indice] = terrorist ? 'm' : 'i';
                         		if (terrorist)
-                            			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_molotov;
+					{
+						if(dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov || !competitivePistolRound)
+						{
+                            				dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_molotov;
+							nades[indice] = 'm';
+							nades_molotov_t_count++;
+							molotov_number++;
+						}
+					}
                         		else
-                            			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
-                        		molotov_number++;
-                        		if (terrorist)
-                            			nades_molotov_t_count++;
-                        		else
-                            			nades_molotov_ct_count++;
+					{
+						if(dollars_for_mimic_competitive_pistol_rounds >= nade_price_for_molotov || !competitivePistolRound)
+						{
+                            				dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - nade_price_for_incgrenade;
+							nades[indice] = 'i';
+							nades_molotov_ct_count++;
+							molotov_number++;
+						}
+					}
 				}
 				//10% chance to give decoy
 				else if(randgive > 9 && (terrorist ? nades_decoy_t_count : nades_decoy_ct_count) < max_decoy_allow && decoy_number == 0) //sometimes give decoy
