@@ -74,7 +74,7 @@ public Plugin myinfo = {
     name = "CS:GO Retakes: Customised Weapon Allocator for splewis retakes plugin,",
     author = "BatMen and Gdk",
     description = "Defines convars to customize weapon allocator of splewis retakes plugin",
-    version = "4.7.0",
+    version = "5.0.0",
     url = "https://github.com/RavageCS/csgo-retakes-splewis-convar-weapon-allocator"
 };
 
@@ -351,19 +351,12 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 			{
 				odds = GetRandomInt(1,10);
                  		// 90% to have kevlar if money before nades
+				// 10% will have kevlar and nades
                  		if (odds < 10)
                  		{
                         		kevlar = 100;
                         		dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
                  		}
-				else
-				{
-					kevlar = 0;
-				}
-			}
-			else if(dollars_for_mimic_competitive_pistol_rounds < kevlar_price)
-			{
-				kevlar = 0;
 			}
 		}
 
@@ -374,7 +367,7 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 		//IntToString(dollars_for_mimic_competitive_pistol_rounds, moneyT, 12);
 		//PrintToChatAll("MoneyT: %s", moneyT);
 
-		//Make sure to give armor if no nades are given (? gives armor even if nades are given? this is ok though)
+		// Give armor to the lucky 10% that get nades and armor (glock only)
 		if(isPistolRound && mimicCompetitivePistolRounds && dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
 		{
 			kevlar = 100;
@@ -503,6 +496,21 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 			//PrintToChatAll("CT Count: %s", testCt);
 			//PrintToChatAll("T Count: %s", testT);
 
+			// 33% chance to have a kit
+			odds = GetRandomInt(1, 3);
+			if(odds == 3)
+			{
+				kit = true;
+				numkits++;
+			}
+						
+			//If there are no kits, give one
+			if(numkits < 1 && i == (ctCount-1))
+			{
+				kit = true;
+				numkits++;
+			}
+
 			if (g_Pistolchoice[client] == 2 && GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
         		{
             			secondary = "weapon_p250";
@@ -534,43 +542,14 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 				if(dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
 				{
 					odds = GetRandomInt(1,4);
-                 			// 75% to have kevlar if money before kit and nades
+                 			// 80% to have kevlar if money before kit and nades
+					// 20% will have kevlar and nades
                  			if (odds < 4)
                  			{
                         			kevlar = 100;
                         			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
                  			}
-					else
-					{
-						kevlar = 0;
-					}
 				}
-				else if(dollars_for_mimic_competitive_pistol_rounds < kevlar_price)
-				{
-					kevlar = 0;
-				}
-			}
-			if(dollars_for_mimic_competitive_pistol_rounds >= kit_price)
-        		{
-				int rand = GetRandomInt(1, 4);
-				//75% to have a kit
-				if(rand < 4)
-				{
-					kit = true;
-					numkits++;
-                			dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
-				}
-			}
-			else if(dollars_for_mimic_competitive_pistol_rounds < kit_price)
-			{
-				kit = false;
-			}
-			
-			//If there are no kits, give one
-			if(numkits < 1 && i == (ctCount-1))
-			{
-				kit = true;
-				numkits++;
 			}
 		
 		}
@@ -582,19 +561,13 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
 		//IntToString(dollars_for_mimic_competitive_pistol_rounds, money, 12);
 		//PrintToChatAll("Money: %s", money);
 
-		//Make sure to give armor or kit if there is left over money
+		// Give armor to the lucky 20% that get nades and armor (usp/p2000 only)
 		if(isPistolRound && mimicCompetitivePistolRounds)
 		{
 			if(dollars_for_mimic_competitive_pistol_rounds >= kevlar_price)
 			{	
 				kevlar = 100;
 				dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kevlar_price;
-			}
-			if(dollars_for_mimic_competitive_pistol_rounds >= kit_price)
-			{
-				kit = true;
-				dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - kit_price;
-				numkits++;
 			}
 		}
 		
