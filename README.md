@@ -1,5 +1,5 @@
 Customised Weapon Allocator 
-------------------
+-------------------
 
 This plugin is an alternate weapon allocator of [Splewis RETAKES Plugin](https://github.com/splewis/csgo-retakes)
 
